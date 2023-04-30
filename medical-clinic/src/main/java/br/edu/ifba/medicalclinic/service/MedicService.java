@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import br.edu.ifba.medicalclinic.domain.dto.MedicDto;
@@ -20,9 +21,9 @@ public class MedicService {
         return MedicDto.toDto(repository.save(entity));
     }
 
-    public Optional<List<MedicDto>> find(String name){
-        if(name == null) return Optional.of(MedicDto.toListDto(repository.findAll()));
-        return Optional.of(MedicDto.toListDto(repository.findByNameContains(name)));
+    public Optional<List<MedicDto>> find(String name, Pageable pageable){
+        if(name == null) return Optional.of(MedicDto.toListDto(repository.findAll(pageable).toList()));
+        return Optional.of(MedicDto.toListDto(repository.findByNameContains(name, pageable)));
     }
 
     public Optional<MedicDto> findById(Long id){

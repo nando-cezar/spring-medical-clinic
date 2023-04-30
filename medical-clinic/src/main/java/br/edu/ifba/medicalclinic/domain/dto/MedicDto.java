@@ -21,6 +21,6 @@ public record MedicDto(Long id, String name, String email, String crm, Specialty
     }
 
     public static List<MedicDto> toListDto(List<Medic> list){
-        return list.stream().map(MedicDto::new).collect(Collectors.toList());
+        return list.stream().map(MedicDto::new).toList();
     }
 }
