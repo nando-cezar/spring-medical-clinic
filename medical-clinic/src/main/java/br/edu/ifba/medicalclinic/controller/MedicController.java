@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.edu.ifba.medicalclinic.domain.dto.MedicDto;
 import br.edu.ifba.medicalclinic.service.MedicService;
-import jakarta.transaction.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
@@ -63,6 +63,7 @@ public class MedicController {
     )
     public ResponseEntity<MedicDto> save(
             @Parameter(description = "New medic body content to be created")
+            @Valid
             @RequestBody MedicDto data,
             UriComponentsBuilder builder
     ){
@@ -104,15 +105,12 @@ public class MedicController {
             @RequestParam(required = true, defaultValue = "10") int size
     ){
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "name"));
-;       var data = service.find(name, pageable).get();
-        var isEmpty = data.isEmpty();     
-        return isEmpty ? 
-            ResponseEntity.notFound().build() : 
-            ResponseEntity.ok().body(data);
+        var data = service.find(name, pageable);
+        return ResponseEntity.ok().body(data);
     }
 
     @PutMapping("/{id}")
-    @Transactional
+    //@Transactional
     @Operation(summary = "Update only one medic")
     @ApiResponses(
             value = {
@@ -141,18 +139,17 @@ public class MedicController {
     public ResponseEntity<MedicDto> update(
             @Parameter(description = "Medic Id to be updated")
             @PathVariable Long id,
+            @Valid
             @Parameter(description = "Medic Elements/Body Content to be updated")
             @RequestBody MedicDto data
     ){
-        return service.findById(id)
-            .map(record -> {
-                var dataUpdated = service.update(id, data);
-                return ResponseEntity.ok().body(dataUpdated);
-            }).orElse(ResponseEntity.notFound().build());
+        service.findById(id);
+        var dataUpdated = service.update(id, data);
+        return ResponseEntity.ok().body(dataUpdated);
     }
 
     @DeleteMapping("/{id}")
-    @Transactional
+    //@Transactional
     @Operation(summary = "Delete only one medic")
     @ApiResponses(
             value = {
@@ -182,10 +179,8 @@ public class MedicController {
             @Parameter(description = "Medic Id to be deleted")
             @PathVariable Long id
     ){
-        return service.findById(id)
-            .map(record -> {
-                service.deleteById(id);
-                return ResponseEntity.ok().body(record);
-            }).orElse(ResponseEntity.notFound().build());
+        var data = service.findById(id);
+        service.deleteById(id);
+        return ResponseEntity.ok().body(data);
     }
 }

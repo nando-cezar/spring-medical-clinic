@@ -3,6 +3,11 @@ package br.edu.ifba.medicalclinic.service;
 import java.util.List;
 import java.util.Optional;
 
+import br.edu.ifba.medicalclinic.domain.exception.handler.GlobalExceptionHandler;
+import br.edu.ifba.medicalclinic.domain.exception.model.MedicNotFoundException;
+import lombok.SneakyThrows;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,13 +26,22 @@ public class MedicService {
         return MedicDto.toDto(repository.save(entity));
     }
 
-    public Optional<List<MedicDto>> find(String name, Pageable pageable){
-        if(name == null) return Optional.of(MedicDto.toListDto(repository.findAll(pageable).toList()));
-        return Optional.of(MedicDto.toListDto(repository.findByNameContains(name, pageable)));
+    @SneakyThrows
+    public List<MedicDto> find(String name, Pageable pageable) {
+        if(name == null){
+            var data = repository.findAll(pageable).toList();
+            if(data.isEmpty()) throw new MedicNotFoundException();
+            return MedicDto.toListDto(data);
+        }
+        var data = repository.findByNameContains(name, pageable);
+        if(data.isEmpty()) throw new MedicNotFoundException(name);
+        return MedicDto.toListDto(data);
     }
 
-    public Optional<MedicDto> findById(Long id){
-        return repository.findById(id).map(MedicDto::new);
+    @SneakyThrows
+    public MedicDto findById(Long id){
+        var data = repository.findById(id).orElseThrow(MedicNotFoundException::new);
+        return new MedicDto(data);
     }
 
     public MedicDto update(Long id, MedicDto data){

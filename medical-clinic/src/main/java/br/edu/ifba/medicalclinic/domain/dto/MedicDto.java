@@ -5,8 +5,16 @@ import java.util.stream.Collectors;
 
 import br.edu.ifba.medicalclinic.domain.enums.Specialty;
 import br.edu.ifba.medicalclinic.entity.Medic;
+import jakarta.validation.constraints.NotNull;
 
-public record MedicDto(Long id, String name, String email, String crm, Specialty specialty, AddressDto address) {
+public record MedicDto(
+        Long id,
+        @NotNull String name,
+        @NotNull String email,
+        @NotNull String crm,
+        @NotNull Specialty specialty,
+        AddressDto address
+) {
     
     public MedicDto(Medic data){
         this(data.getId(), data.getName(), data.getEmail(), data.getCrm(), data.getSpecialty(), AddressDto.toDto(data.getAddress()));
