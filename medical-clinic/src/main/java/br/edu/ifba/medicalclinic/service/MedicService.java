@@ -21,11 +21,20 @@ public class MedicService {
     @Autowired
     private MedicRepository repository;
 
+    /**
+     * @param data The body content to be created
+     * @return a {@code ResponseEntity} instance
+     */
     public MedicDto save(MedicDto data){
         var entity = data.toEntity();
         return MedicDto.toDto(repository.save(entity));
     }
 
+    /**
+     * @param name The param to filter (optional)
+     * @param pageable The param to pagination
+     * @return a {@code ResponseEntity} instance
+     */
     @SneakyThrows
     public List<MedicDto> find(String name, Pageable pageable) {
         if(name == null){
@@ -38,18 +47,30 @@ public class MedicService {
         return MedicDto.toListDto(data);
     }
 
+    /**
+     * @param id The id to be searched
+     * @return a {@code ResponseEntity} instance
+     */
     @SneakyThrows
     public MedicDto findById(Long id){
         var data = repository.findById(id).orElseThrow(MedicNotFoundException::new);
         return new MedicDto(data);
     }
 
+    /**
+     * @param id The id to be updated
+     * @param data The elements/Body Content to be updated
+     * @return a {@code ResponseEntity} instance
+     */
     public MedicDto update(Long id, MedicDto data){
         var entity = data.toEntity();
         entity.setId(id);
         return MedicDto.toDto(repository.save(entity));
     }
 
+    /**
+     * @param id The id to be deleted
+     */
     public void deleteById(Long id){
         repository.deleteById(id);
     }

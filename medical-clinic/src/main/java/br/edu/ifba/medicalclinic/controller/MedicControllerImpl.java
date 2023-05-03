@@ -2,7 +2,6 @@ package br.edu.ifba.medicalclinic.controller;
 
 import java.util.List;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +30,15 @@ public class MedicControllerImpl implements MedicController {
     @Autowired
     private MedicService service;
 
+    /**
+     * @param data The body content to be created
+     * @param builder Allows flexibility of using URI template
+     *                variables and possibility to inject it directly.
+     * @return a {@code ResponseEntity} instance
+     */
     @Override
     @PostMapping
     public ResponseEntity<MedicDto> save(
-            @Parameter(description = "New medic body content to be created")
             @Valid
             @RequestBody MedicDto data,
             UriComponentsBuilder builder
@@ -44,10 +48,15 @@ public class MedicControllerImpl implements MedicController {
         return ResponseEntity.created(uri).body(dataSaved);
     }
 
+    /**
+     * @param name The param to filter (optional)
+     * @param page The current page to pagination, with default value 0
+     * @param size The size to pagination, with default value 10
+     * @return a {@code ResponseEntity} instance
+     */
     @Override
     @GetMapping
     public ResponseEntity<List<MedicDto>> find(
-            @Parameter(description = "Name for medic to be found (optional)")
             @RequestParam(required = false) String name,
             @RequestParam(required = true, defaultValue = "0") int page,
             @RequestParam(required = true, defaultValue = "10") int size
@@ -57,14 +66,17 @@ public class MedicControllerImpl implements MedicController {
         return ResponseEntity.ok().body(data);
     }
 
+    /**
+     * @param id The id to be updated
+     * @param data The elements/Body Content to be updated
+     * @return a {@code ResponseEntity} instance
+     */
     @Override
     @PutMapping("/{id}")
     @Transactional
     public ResponseEntity<MedicDto> update(
-            @Parameter(description = "Medic Id to be updated")
             @PathVariable Long id,
             @Valid
-            @Parameter(description = "Medic Elements/Body Content to be updated")
             @RequestBody MedicDto data
     ){
         service.findById(id);
@@ -72,11 +84,14 @@ public class MedicControllerImpl implements MedicController {
         return ResponseEntity.ok().body(dataUpdated);
     }
 
+    /**
+     * @param id The id to be deleted
+     * @return a {@code ResponseEntity} instance
+     */
     @Override
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<MedicDto> deleteById(
-            @Parameter(description = "Medic Id to be deleted")
             @PathVariable Long id
     ){
         var data = service.findById(id);

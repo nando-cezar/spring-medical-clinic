@@ -42,6 +42,7 @@ public interface MedicController {
             }
     )
     ResponseEntity<MedicDto> save(
+            @Parameter(description = "New medic body content to be created")
             MedicDto data,
             UriComponentsBuilder builder
     );
@@ -72,6 +73,7 @@ public interface MedicController {
             }
     )
     ResponseEntity<List<MedicDto>> find(
+            @Parameter(description = "Name for medic to be found (optional)")
             String name,
             int page,
             int size
@@ -103,7 +105,9 @@ public interface MedicController {
             }
     )
     ResponseEntity<MedicDto> update(
-            Long id,
+            @Parameter(description = "Medic Id to be updated")
+            @PathVariable Long id,
+            @Parameter(description = "Medic Elements/Body Content to be updated")
             MedicDto data
     );
 
@@ -133,6 +137,7 @@ public interface MedicController {
             }
     )
     ResponseEntity<MedicDto> deleteById(
+            @Parameter(description = "Medic Id to be deleted")
             Long id
     );
 }
