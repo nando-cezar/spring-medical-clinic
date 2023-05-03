@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.util.WebUtils;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,20 +40,22 @@ public class GlobalExceptionHandler {
         LOGGER.error("Handling " + ex.getClass().getSimpleName() + " due to " + ex.getMessage());
 
         if (ex instanceof MedicNotFoundException unfe) {
-            HttpStatus status = HttpStatus.NOT_FOUND;
-
+            var status = HttpStatus.NOT_FOUND;
             return handleMedicNotFoundException(unfe, headers, status, request);
         } else if (ex instanceof ContentNotAllowedException cnae) {
-            HttpStatus status = HttpStatus.BAD_REQUEST;
-
+            var status = HttpStatus.BAD_REQUEST;
             return handleContentNotAllowedException(cnae, headers, status, request);
         } else {
-            if (LOGGER.isWarnEnabled()) {
+            if (LOGGER.isWarnEnabled())
                 LOGGER.warn("Unknown exception type: " + ex.getClass().getName());
-            }
 
-            HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-            return handleExceptionInternal(ex, null, headers, status, request);
+            var status = HttpStatus.INTERNAL_SERVER_ERROR;
+            var error = Collections.singletonList(
+                    "Unknown exception: " +
+                    LocalDateTime.now() + ": " +
+                    ex.getCause().getLocalizedMessage()
+            );
+            return handleExceptionInternal(ex, new ApiError(error), headers, status, request);
         }
     }
 
@@ -68,7 +71,7 @@ public class GlobalExceptionHandler {
                                                                     HttpHeaders headers,
                                                                     HttpStatus status,
                                                                     WebRequest request) {
-        List<String> errors = Collections.singletonList(ex.getMessage());
+        var errors = Collections.singletonList(ex.getMessage());
         return handleExceptionInternal(ex, new ApiError(errors), headers, status, request);
     }
 
@@ -84,12 +87,12 @@ public class GlobalExceptionHandler {
                                                                         HttpHeaders headers,
                                                                         HttpStatus status,
                                                                         WebRequest request) {
-        List<String> errorMessages = ex.getErrors()
+        var errors = ex.getErrors()
                 .stream()
                 .map(contentError -> contentError.getObjectName() + " " + contentError.getDefaultMessage())
                 .collect(Collectors.toList());
 
-        return handleExceptionInternal(ex, new ApiError(errorMessages), headers, status, request);
+        return handleExceptionInternal(ex, new ApiError(errors), headers, status, request);
     }
 
     /**
@@ -105,7 +108,7 @@ public class GlobalExceptionHandler {
      * @param status The response status
      * @param request The current request
      */
-    protected ResponseEntity<ApiError> handleExceptionInternal(Exception ex, @Nullable ApiError body,
+    protected ResponseEntity<ApiError> handleExceptionInternal(Exception ex, ApiError body,
                                                                HttpHeaders headers,
                                                                HttpStatus status,
                                                                WebRequest request) {
