@@ -1,0 +1,10 @@
+CREATE TABLE medics(
+    id SERIAL,
+    name VARCHAR(50) NOT NULL,
+    email VARCHAR(50) NOT NULL UNIQUE,
+    CRM VARCHAR(6) NOT NULL UNIQUE,
+    specialty VARCHAR(100) NOT NULL,
+    full_address VARCHAR(255),
+
+    CONSTRAINT PK_MEDICS PRIMARY KEY (id)
+);

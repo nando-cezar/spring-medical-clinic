@@ -23,15 +23,17 @@ public class Medic{
     private Long id;
     private String name;
     private String email;
+    private String telephone;
     private String crm;
     @Enumerated(EnumType.STRING)
     private Specialty specialty;
     @Embedded
     private Address address;
 
-    public Medic(String name, String email, String crm, Specialty specialty, Address address) {
+    public Medic(String name, String email, String telephone, String crm, Specialty specialty, Address address) {
         this.name = name;
         this.email = email;
+        this.telephone = telephone;
         this.crm = crm;
         this.specialty = specialty;
         this.address = address;

@@ -2,13 +2,12 @@ package br.edu.ifba.medicalclinic.controller;
 
 import java.util.List;
 
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,6 +37,7 @@ public class MedicControllerImpl implements MedicController {
      */
     @Override
     @PostMapping
+    @Transactional
     public ResponseEntity<MedicDto> save(
             @Valid
             @RequestBody MedicDto data,
@@ -50,18 +50,15 @@ public class MedicControllerImpl implements MedicController {
 
     /**
      * @param name The param to filter (optional)
-     * @param page The current page to pagination, with default value 0
-     * @param size The size to pagination, with default value 10
+     * @param pageable The pageable function
      * @return a {@code ResponseEntity} instance
      */
     @Override
     @GetMapping
     public ResponseEntity<List<MedicDto>> find(
             @RequestParam(required = false) String name,
-            @RequestParam(required = true, defaultValue = "0") int page,
-            @RequestParam(required = true, defaultValue = "10") int size
+            @PageableDefault(page = 0, size = 10, sort = {"name"}) Pageable pageable
     ){
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "name"));
         var data = service.find(name, pageable);
         return ResponseEntity.ok().body(data);
     }

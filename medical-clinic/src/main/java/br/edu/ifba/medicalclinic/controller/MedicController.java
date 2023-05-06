@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -75,8 +76,7 @@ public interface MedicController {
     ResponseEntity<List<MedicDto>> find(
             @Parameter(description = "Name for medic to be found (optional)")
             String name,
-            int page,
-            int size
+            Pageable pageable
     );
 
     @Operation(summary = "Update only one medic")
